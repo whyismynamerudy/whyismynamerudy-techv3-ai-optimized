@@ -1,0 +1,23 @@
+.stats {
+  padding: 0 1.2rem 2.4rem;
+}
+
+.statColumn {
+  h4 {
+    display: flex;
+    align-items: center;
+    font-size: var(--text-md);
+
+    margin-bottom: 2.4rem;
+    span {
+      margin-left: 0.8rem;
+    }
+  }
+}
+
+.statGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 3.8rem;
+}
