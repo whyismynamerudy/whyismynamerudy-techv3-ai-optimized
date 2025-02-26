@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import styles from "./sidebar.module.scss";
+import { withAIEnhancement } from "next-ai-optimizer/react";
 
-export const SideBar = () => {
+const SideBarComponent = () => {
   const [selected, setSelected] = useState("");
 
   useEffect(() => {
@@ -80,3 +81,30 @@ export const SideBar = () => {
     </motion.nav>
   );
 };
+
+export const SideBar = withAIEnhancement(SideBarComponent as any, {
+  name: "SideBar",
+  description: "A vertical sidebar navigation component with animated links to portfolio sections",
+  interactionPoints: [
+    {
+      element: "a[href='#about']",
+      type: "click",
+      description: "Navigate to the About section"
+    },
+    {
+      element: "a[href='#projects']",
+      type: "click",
+      description: "Navigate to the Projects section"
+    },
+    {
+      element: "a[href='#experience']",
+      type: "click",
+      description: "Navigate to the Experience section"
+    },
+    {
+      element: "a[href='#contact']",
+      type: "click",
+      description: "Navigate to the Contact section"
+    }
+  ]
+});
