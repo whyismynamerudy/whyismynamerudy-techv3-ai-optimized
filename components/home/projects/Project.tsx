@@ -7,7 +7,7 @@ import { AiFillGithub, AiOutlineExport } from "react-icons/ai";
 import { ProjectModal } from "./ProjectModal";
 import styles from "./projects.module.scss";
 
-interface ProjectProps {
+interface Props {
   modalContent: JSX.Element;
   description: string;
   projectLink: string;
@@ -15,10 +15,11 @@ interface ProjectProps {
   tech: string[];
   title: string;
   code: string;
+  aiMetadata?: any; // This is how withAIEnhancement passes props for non-DOM components
 }
 
-// Original component without forwarded ref
-function OriginalProject({
+// Create a component that properly handles the aiMetadata prop
+const ProjectWithAI = ({
   modalContent,
   projectLink,
   description,
@@ -26,7 +27,8 @@ function OriginalProject({
   title,
   code,
   tech,
-}: ProjectProps) {
+  aiMetadata, // This gets passed by withAIEnhancement
+}: Props) => {
   const [hovered, setHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const controls = useAnimation();
@@ -42,7 +44,8 @@ function OriginalProject({
   }, [isInView, controls]);
 
   return (
-    <>
+    // Use a div with the aiMetadata ref to capture the AI enhancement attributes
+    <div ref={aiMetadata?.ref} className={styles.projectContainer}>
       <motion.div
         ref={ref}
         variants={{
@@ -122,26 +125,17 @@ function OriginalProject({
         code={code}
         tech={tech}
       />
-    </>
-  );
-}
-
-// Wrapper component that applies the AI enhancement
-const AIEnhancedProjectWrapper = (props: ProjectProps) => {
-  return (
-    <div data-ai-component="Project" data-ai-description="A project card component that displays project information with modal and external links">
-      <OriginalProject {...props} />
     </div>
   );
 };
 
-// Apply withAIEnhancement to the wrapper
-export const Project = withAIEnhancement(AIEnhancedProjectWrapper as any, {
+// Apply withAIEnhancement to the component
+export const Project = withAIEnhancement(ProjectWithAI as any, {
   name: 'Project',
   description: 'A project card component that displays project information with modal and external links',
   interactionPoints: [
     {
-      element: 'div.projectImage',
+      element: '#project-image-[a-z-]+',
       type: 'click',
       description: 'Open project details modal'
     },
