@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { AiFillGithub, AiOutlineExport } from "react-icons/ai";
 import { ProjectModal } from "./ProjectModal";
 import styles from "./projects.module.scss";
+import { withAIEnhancement } from "next-ai-optimizer/react";
 
 interface Props {
   modalContent: JSX.Element;
@@ -19,7 +20,7 @@ interface Props {
   code: string;
 }
 
-export const Project = ({
+export const ProjectBase = ({
   modalContent,
   projectLink,
   description,
@@ -114,3 +115,31 @@ export const Project = ({
     </>
   );
 };
+
+export const Project = withAIEnhancement(ProjectBase as any, {
+  name: 'Project',
+  description: 'A project card component that displays project information with modal and external links',
+  interactionPoints: [
+    {
+      element: 'div.projectImage',
+      type: 'click',
+      description: 'Open project details modal'
+    },
+    {
+      element: 'a[href][target="_blank"]',
+      type: 'click',
+      description: 'Visit external project link'
+    },
+    {
+      element: 'p.projectDescription span',
+      type: 'click',
+      description: 'Learn more about the project',
+      completes: true
+    },
+    {
+      element: 'a svg[size="2.8rem"]',
+      type: 'click',
+      description: 'Visit project code repository or live site'
+    }
+  ]
+});
