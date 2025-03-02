@@ -1,16 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
-import { Reveal } from "@/components/utils/Reveal";
-import { motion, useAnimation, useInView } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { Container } from "postcss";
+import { withAIEnhancement } from "next-ai-optimizer/react";
 import { useEffect, useRef, useState } from "react";
+import { motion, useAnimation, useInView } from "framer-motion";
+import { Reveal } from "@/components/utils/Reveal";
+import Link from "next/link";
 import { AiFillGithub, AiOutlineExport } from "react-icons/ai";
 import { ProjectModal } from "./ProjectModal";
 import styles from "./projects.module.scss";
-import { withAIEnhancement } from "next-ai-optimizer/react";
 
-interface Props {
+interface ProjectProps {
   modalContent: JSX.Element;
   description: string;
   projectLink: string;
@@ -20,7 +17,8 @@ interface Props {
   code: string;
 }
 
-export const ProjectBase = ({
+// Original component without forwarded ref
+function OriginalProject({
   modalContent,
   projectLink,
   description,
@@ -28,13 +26,10 @@ export const ProjectBase = ({
   title,
   code,
   tech,
-}: Props) => {
+}: ProjectProps) {
   const [hovered, setHovered] = useState(false);
-
   const [isOpen, setIsOpen] = useState(false);
-
   const controls = useAnimation();
-
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
@@ -63,6 +58,7 @@ export const ProjectBase = ({
           onMouseLeave={() => setHovered(false)}
           onClick={() => setIsOpen(true)}
           className={styles.projectImage}
+          id={`project-image-${title.toLowerCase().replace(/\s+/g, '-')}`}
         >
           <img
             src={imgSrc}
@@ -71,7 +67,6 @@ export const ProjectBase = ({
               width: hovered ? "90%" : "85%",
               rotate: hovered ? "2deg" : "0deg",
             }}
-            // sizes={`${hovered ? "90vw" : "85vw"}`}
           />
         </div>
         <div className={styles.projectCopy}>
@@ -80,12 +75,22 @@ export const ProjectBase = ({
               <h4>{title}</h4>
               <div className={styles.projectTitleLine} />
               {code !== "" && (
-                <Link href={code} target="_blank" rel="nofollow">
+                <Link 
+                  href={code} 
+                  target="_blank" 
+                  rel="nofollow"
+                  id={`github-link-${title.toLowerCase().replace(/\s+/g, '-')}`}
+                >
                   <AiFillGithub size="2.8rem" />
                 </Link>
               )}
               {projectLink !== "" && (
-                <Link href={projectLink} target="_blank" rel="nofollow">
+                <Link 
+                  href={projectLink} 
+                  target="_blank" 
+                  rel="nofollow"
+                  id={`live-link-${title.toLowerCase().replace(/\s+/g, '-')}`}
+                >
                   <AiOutlineExport size="2.8rem" />
                 </Link>
               )}
@@ -97,7 +102,12 @@ export const ProjectBase = ({
           <Reveal>
             <p className={styles.projectDescription}>
               {description}{" "}
-              <span onClick={() => setIsOpen(true)}>Learn more {">"}</span>
+              <span 
+                onClick={() => setIsOpen(true)}
+                id={`learn-more-${title.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                Learn more {">"}
+              </span>
             </p>
           </Reveal>
         </div>
@@ -114,9 +124,19 @@ export const ProjectBase = ({
       />
     </>
   );
+}
+
+// Wrapper component that applies the AI enhancement
+const AIEnhancedProjectWrapper = (props: ProjectProps) => {
+  return (
+    <div data-ai-component="Project" data-ai-description="A project card component that displays project information with modal and external links">
+      <OriginalProject {...props} />
+    </div>
+  );
 };
 
-export const Project = withAIEnhancement(ProjectBase as any, {
+// Apply withAIEnhancement to the wrapper
+export const Project = withAIEnhancement(AIEnhancedProjectWrapper as any, {
   name: 'Project',
   description: 'A project card component that displays project information with modal and external links',
   interactionPoints: [
@@ -126,20 +146,20 @@ export const Project = withAIEnhancement(ProjectBase as any, {
       description: 'Open project details modal'
     },
     {
-      element: 'a[href][target="_blank"]',
+      element: 'a[id^="github-link"]',
       type: 'click',
-      description: 'Visit external project link'
+      description: 'Visit project code repository on GitHub'
     },
     {
-      element: 'p.projectDescription span',
+      element: 'a[id^="live-link"]',
+      type: 'click',
+      description: 'Visit live project site'
+    },
+    {
+      element: 'span[id^="learn-more"]',
       type: 'click',
       description: 'Learn more about the project',
       completes: true
-    },
-    {
-      element: 'a svg[size="2.8rem"]',
-      type: 'click',
-      description: 'Visit project code repository or live site'
     }
   ]
 });
