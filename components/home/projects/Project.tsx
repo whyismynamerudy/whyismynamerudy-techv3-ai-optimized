@@ -135,7 +135,7 @@ export const Project = withAIEnhancement(ProjectWithAI as any, {
   description: 'A project card component that displays project information with modal and external links',
   interactionPoints: [
     {
-      element: '#project-image-[a-z-]+',
+      element: 'div[id^="project-image-"]',
       type: 'click',
       description: 'Open project details modal'
     },
